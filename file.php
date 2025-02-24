@@ -70,33 +70,6 @@ class File {
             }
         }
     }
-    // public function get_dirs ($path = 'notes', $index = 0) {
-    //     $dir = array_diff(scandir($path), array('..', '.'));
-    //     foreach ( $dir as $key => $name ) {
-    //         if ( is_dir($path) ) {
-    //             $path = $path . DIRECTORY_SEPARATOR . $name;
-    //             $index = $index . '-' . $key;
-    //             $dirs[$index] = $path;
-    //             $dirs = $this->get_dirs($path, $index);
-    //         }
-    //     }
-    //     return $dirs;
-    // }
-    // private function get_dir_files ($dir) {
-
-    // }
-
-    // private function get_file_path($path_arr, $path = 'notes') {
-    //     if ( ! empty($path_arr) ) {
-    //         $names = scandir($path);
-    //         $name = $names[array_shift($path_arr)];
-    //         $path = $path . DIRECTORY_SEPARATOR . $name;
-    //         if ( is_dir($path) ) {
-    //             $path = $this->get_file_path($path_arr, $path);
-    //         }
-    //     }
-    //     return $path;
-    // }
     private function get_file_content($path) {
         if ( is_file($path) ) {
             return file_get_contents($path);

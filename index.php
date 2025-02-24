@@ -1,17 +1,4 @@
 <?php
-// $file_name = '';
-// $file_text = '';
-// if ( ! empty($_GET['path']) ) {
-//     $num_file = $_GET['file'];
-//     $num_dir = $_GET['dir'];
-//     $main_dir = 'notes';
-//     $dirs = scandir($main_dir);
-//     $dir_name = $dirs[$num_dir];
-//     $files = scandir($dir);
-//     $file_info = get_file($_GET['path']);
-//     $file_name = $file_info['file_name'];
-//     $file_text = $file_info['file_text']; file_get_contents( $main_dir . DIRECTORY_SEPARATOR . $dir_name . DIRECTORY_SEPARATOR . $file_name );
-// }
 error_reporting(E_ALL);
 ini_set('display_errors', 'on');
 require_once('file.php');
