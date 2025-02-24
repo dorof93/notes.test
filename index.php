@@ -48,9 +48,9 @@ if ( ! empty($_POST) ) {
                 <label class="form__label">Папка</label>
                 <?php 
                     $dirs = $file->get_dirs();
-                    foreach ($dirs as $index => $dir) {
+                    foreach ($dirs as $dir) {
                         ?>
-                        <input type="radio" name="dir" value="<?php echo $index; ?>"><?php echo $dir; ?>
+                        <input type="radio" name="dir" value="<?php echo $dir; ?>"><?php echo $dir; ?>
                 <?php } ?>
             </div>
             <div class="form__field">
@@ -60,10 +60,10 @@ if ( ! empty($_POST) ) {
         <ul class="tree list">
             <?php 
                 $tree = $file->get_files();
-                foreach ($tree as $index => $name) {
+                foreach ($tree as $name) {
                     ?>
                     <li class="list__item">
-                        <a href="/?index=<?php echo $index; ?>">
+                        <a href="/?path=<?php echo $name; ?>">
                             <?php echo $name; ?>
                         </a>
                     </li>

@@ -3,19 +3,18 @@
 class File {
     private $dirs = [];
     private $files = [];
+    private $tree = [];
     private $path = '';
     private $content = '';
 
     public function __construct () {
 
-        $this->dirs = $this->get_tree('dirs');
-        $this->files = $this->get_tree('files');
-        if ( ! empty($_GET['index']) ) {
-            $index = $_GET['index'];
-            if ( ! empty($this->files[$index]) ) {
-                $path = $this->files[$index];
-                $content = $this->get_file_content($path);
+        $this->set_tree('notes');
+        if ( ! empty($_GET['path']) ) {
+            $path = $_GET['path'];
+            if ( file_exists($path) ) {
                 $this->set_path($path);
+                $content = $this->get_file_content($path);
                 $this->set_content($content);
             }
         }
@@ -37,6 +36,9 @@ class File {
     public function get_files () {
         return $this->files;
     }
+    public function get_tree () {
+        return $this->tree;
+    }
     public function set_path ($path) {
         $this->path = $path;
     }
@@ -55,37 +57,18 @@ class File {
         }
         return false;
     }
-    private function get_tree ($mode = 'all', $path = 'notes', $index = '') {
-        $dir = array_diff(scandir($path), array('..', '.'));
-        $tree = [];
-        foreach ( $dir as $key => $name ) {
-            $path = $path . DIRECTORY_SEPARATOR . $name;
-            $is_dir = is_dir($path);
-            if ( empty($index) ) {
-                $index = $key;
+    private function set_tree ($dir) {
+        $dir_files = array_diff(scandir($dir), array('..', '.'));
+        foreach ( $dir_files as $name ) {
+            $path = $dir . DIRECTORY_SEPARATOR . $name;
+            $this->tree[] = $path;
+            if ( ! is_dir($path) ) {
+                $this->files[] = $path;
             } else {
-                $index = $index . '-' . $key;
-            }
-            if ( $is_dir ) {
-                $tree = $this->get_tree($mode, $path, $index);
-            }
-            switch ( $mode ) {
-                case 'dirs':
-                    if ( $is_dir ) {
-                        $tree[$index] = $path;
-                    }
-                    break;
-                case 'files':
-                    if ( ! $is_dir ) {
-                        $tree[$index] = $path;
-                    }
-                    break;
-                default:
-                    $tree[$index] = $path;
-                break;
+                $this->dirs[] = $path;
+                $this->set_tree($path);
             }
         }
-        return $tree;
     }
     // public function get_dirs ($path = 'notes', $index = 0) {
     //     $dir = array_diff(scandir($path), array('..', '.'));
