@@ -61,7 +61,13 @@ class File {
             header("Location:" . $_SERVER['REQUSET_URI']); 
             die();
         }
-        $file_path = $data['dir'] . DIRECTORY_SEPARATOR . $data['title'] . '.txt';
+        if ( ! empty($data['new_dir']) ) {
+            $dir = self::MAIN_DIR . DIRECTORY_SEPARATOR . $data['new_dir'];
+            $this->save_dir($dir);
+        } else {
+            $dir = $data['dir'];
+        }
+        $file_path = $dir . DIRECTORY_SEPARATOR . $data['title'] . '.txt';
         $text = $data['text'];
         $this->set_path($file_path);
         $this->set_content($text);
@@ -96,14 +102,14 @@ class File {
         }
         return false;
     }
-    public function save_dir () {
-        if ( ! empty($this->path) ) {
-            return mkdir($this->path, 0755);
+    private function save_dir ($path) {
+        if ( ! empty($path) ) {
+            return mkdir($path, 0755);
         }
         return false;
     }
     private function validate_data ($data) {
-        if ( empty($data['dir']) ) {
+        if ( empty($data['dir']) && empty($data['new_dir']) ) {
             $_SESSION['errors'][] = 'Пожалуйста, выберите папку';
         }
         if ( empty($data['title']) ) {

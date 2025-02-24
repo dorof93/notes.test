@@ -55,6 +55,9 @@ if ( ! empty($_GET['del']) ) {
             </div>
             <div class="form__field">
                 <label class="form__label">Папка</label>
+                <div class="form__field form__field_full">
+                    <input class="form__text form__input" type="text" name="new_dir" placeholder="Создать папку">
+                </div>
                 <?php 
                     $dirs = $file->get_dirs();
                     foreach ($dirs as $dir) {
