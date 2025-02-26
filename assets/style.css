@@ -220,6 +220,9 @@ body {
 .note-form__button {
   margin-top: 15px;
 }
+.form__field_h-center {
+  align-self: center;
+}
 .note-form {
     display: grid;
     grid-template-rows: auto auto 1fr;
@@ -368,10 +371,10 @@ body {
     text-decoration: underline;
   }
   .form__checkbox {
-    position: absolute;
+    /* position: absolute;
     top: 0;
     left: 0;
-    z-index: 1;
+    z-index: 1; */
   }
   .form__button {
     grid-column: span 2;

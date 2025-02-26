@@ -1,16 +1,10 @@
 <?php
 
 class File {
-    const MAIN_DIR = 'notes';
-    private $dirs = [];
-    private $files = [];
-    private $tree = [];
     private $path = '';
     private $content = '';
 
     public function __construct () {
-
-        $this->set_tree(self::MAIN_DIR);
         if ( ! empty($_GET['path']) ) {
             $path = $_GET['path'];
             if ( file_exists($path) ) {
@@ -41,15 +35,6 @@ class File {
     public function get_content () {
         return $this->content;
     }
-    public function get_dirs () {
-        return $this->dirs;
-    }
-    public function get_files () {
-        return $this->files;
-    }
-    public function get_tree () {
-        return $this->tree;
-    }
     public function set_path ($path) {
         $this->path = $path;
     }
@@ -62,10 +47,14 @@ class File {
             die();
         }
         if ( ! empty($data['new_dir']) ) {
-            $dir = self::MAIN_DIR . DIRECTORY_SEPARATOR . $data['new_dir'];
+            $dir = MAIN_DIR . DIRECTORY_SEPARATOR . $data['new_dir'];
             $this->save_dir($dir);
         } else {
             $dir = $data['dir'];
+        }
+        if ( ! empty($data['rename']) ) {
+            $this->set_path($data['rename']);
+            $this->delete();
         }
         $file_path = $dir . DIRECTORY_SEPARATOR . $data['title'] . '.txt';
         $text = $data['text'];
@@ -122,19 +111,6 @@ class File {
             return false;
         }
         return true;
-    }
-    private function set_tree ($dir) {
-        $dir_files = array_diff(scandir($dir), array('..', '.'));
-        foreach ( $dir_files as $name ) {
-            $path = $dir . DIRECTORY_SEPARATOR . $name;
-            $this->tree[] = $path;
-            if ( ! is_dir($path) ) {
-                $this->files[] = $path;
-            } else {
-                $this->dirs[] = $path;
-                $this->set_tree($path);
-            }
-        }
     }
     private function get_file_content($path) {
         if ( is_file($path) ) {
