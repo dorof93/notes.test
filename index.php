@@ -17,7 +17,7 @@ if ( ! empty($_GET['del']) ) {
 <!DOCTYPE html>
 <html lang="ru">
     <head>
-        <title>Заметки</title>
+        <title><?php echo $file->get_name() ?></title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="/assets/style.css?v=<?php echo filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/style.css') ?>" rel="stylesheet">
@@ -26,23 +26,33 @@ if ( ! empty($_GET['del']) ) {
     <body>
         <div class="section">
             <div class="section__container">
+                <div class="header">
+                    <div class="logo header__logo">
+                        <a href="/" class="title link link_big logo__link">
+                            /Органайзер/
+                        </a>
+                    </div>
+                    <div class="menu-switcher">
+                        <span class="menu-switcher__line"></span>
+                        <span class="menu-switcher__line"></span>
+                        <span class="menu-switcher__line"></span>
+                    </div>
+                </div>
                 <div class="workspace">
                     <ul class="tree list">
-                        <li class="list__item">
-                            <a class="link list__link link_big" href="/">
-                                Создать заметку
-                            </a>
-                        </li>
                         <?php 
                             $files = new Tree;
+                            $files->current_path = $file->get_path();
                             $files->dir_list_after = '</ul></li>';
-                            $files->dir_output = '<li class="list__item link_bold">%%short_path%%<ul class="list list__sub">';
+                            $files->dir_output = '<li class="list__item tree__dir">
+                                <span class="list__item_bold accordeon" data-acc_id="%%short_path%%">%%short_path%%</span>
+                                <ul class="list list__sub">';
                             $files->file_output = '
                                 <li class="list__item">
-                                    <a class="link list__link tree__link_red link_confirm" data-confirm="Удалить заметку?" href="/?path=%%path%%&del=1">
+                                    <a class="link list__link list__link_red confirm" data-confirm="Удалить заметку %%short_path%%?" href="/?path=%%path%%&del=1">
                                         [x]
                                     </a>
-                                    <a class="link list__link" href="/?path=%%path%%">
+                                    <a class="link list__link %%curr_active%%" href="/?path=%%path%%">
                                         %%short_path%%
                                     </a>
                                 </li>
@@ -83,7 +93,7 @@ if ( ! empty($_GET['del']) ) {
                             <input class="form__checkbox" type="checkbox" name="rename" value="<?php echo $file->get_path() ?>"> Переместить / переименовать
                         </div>
                         <div class="form__field">
-                            <textarea class="form__text form__textarea note-form__textarea" name="text" placeholder="Текст заметки"><?php echo $file->get_content() ?></textarea>
+                            <textarea class="form__text form__textarea note-form__textarea form__textarea_active-tab" name="text" placeholder="Текст заметки"><?php echo $file->get_content() ?></textarea>
                         </div>
                         <div class="form__field">
                             <label class="form__label">Папка</label>
@@ -101,6 +111,9 @@ if ( ! empty($_GET['del']) ) {
                             <input class="button form__button note-form__button" type="submit" value="Сохранить">
                         </div>
                     </form>
+                </div>
+                <div class="footer">
+                    (c) Oleg Dorofeev 2025
                 </div>
             </div>
         </div>

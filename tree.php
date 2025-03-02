@@ -14,7 +14,8 @@ class Tree {
             if ( ! in_array($value, array(".","..")) ) {
                 $path = $dir . DIRECTORY_SEPARATOR . $value;
                 $short_path = $this->get_short_path($path);
-                $checked = Helper::checkbox_value($path, $this->current_path);
+                $checked = Helper::check_elem_active($path, $this->current_path, 'checked="cheked"');
+                $curr_active = Helper::check_elem_active($path, $this->current_path, 'active');
                 if ( is_dir($path) ) {
                     $output = $this->dir_output;
                 } else {
@@ -23,6 +24,7 @@ class Tree {
                 $output = str_replace('%%path%%', $path, $output);
                 $output = str_replace('%%short_path%%', $short_path, $output);
                 $output = str_replace('%%checked%%', $checked, $output);
+                $output = str_replace('%%curr_active%%', $curr_active, $output);
                 echo $output;
                 if ( is_dir($path) ) {
                     $this->show_dir($path);

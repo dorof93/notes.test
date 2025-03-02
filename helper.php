@@ -1,9 +1,9 @@
 <?php
 class Helper {
-    public static function checkbox_value ($val, $true_val) {
+    public static function check_elem_active ($val, $true_val, $text = '') {
         if ($val == $true_val) {
-            return 'checked="cheked"';
+            return $text;
         }
-        return false;
+        return '';
     }
 }
