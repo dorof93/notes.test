@@ -7,10 +7,15 @@ class File {
     public function __construct () {
         if ( ! empty($_GET['path']) ) {
             $path = $_GET['path'];
-            if ( file_exists($path) ) {
+            if ( file_exists($path) && ! is_dir($path) ) {
                 $this->set_path($path);
                 $content = $this->get_file_content($path);
                 $this->set_content($content);
+            } elseif ( $path == MAIN_DIR ) {
+                $this->set_path($path);
+            } else {
+                header("Location:/"); 
+                die();
             }
         }
     }
