@@ -244,6 +244,13 @@ body {
     grid-template-rows: auto auto 1fr;
     grid-template-columns: 1fr 33%;
     grid-gap: 0px 2vw;
+    overflow: auto;
+  }
+.note-form__fieldset {
+    display: grid;
+    align-content: start;
+    grid-template-columns: 1fr 33%;
+    grid-gap: 0px 2vw;
   }
   .form__field {
     position: relative;

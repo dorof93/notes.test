@@ -77,7 +77,7 @@ if ( ! empty($_GET['del']) ) {
                                 <div class="form__backend-success note-form__backend-success">
                                     <?php foreach ($_SESSION['success'] as $success) { ?>
                                         <div class="form__success form__success_active">
-                                            <div class="form__success-marker">!</div>
+                                            <div class="form__success-marker">i</div>
                                             <div class="form__success-text"><?php echo $success ?></div>
                                         </div>
                                     <?php } ?> 
@@ -85,28 +85,49 @@ if ( ! empty($_GET['del']) ) {
                                 <?php unset($_SESSION['success']); ?>
                             <?php } ?>
                         </div>
-                        <div class="form__field">
-                            <label class="form__label">Заголовок</label>
-                            <input class="form__text form__input note-form__input" type="text" name="title" value="<?php echo $file->get_name() ?>">
-                        </div>
-                        <div class="form__field form__field_h-center">
-                            <input class="form__checkbox" type="checkbox" name="rename" value="<?php echo $file->get_path() ?>"> Переместить / переименовать
-                        </div>
-                        <div class="form__field">
-                            <textarea class="form__text form__textarea note-form__textarea form__textarea_active-tab" name="text" placeholder="Текст заметки"><?php echo $file->get_content() ?></textarea>
-                        </div>
-                        <div class="form__field">
-                            <label class="form__label">Папка</label>
+                        <?php if ( ! empty($_GET['path']) && $_GET['path'] == MAIN_DIR ) { ?>
                             <div class="form__field form__field_full">
                                 <input class="form__text form__input note-form__input" type="text" name="new_dir" placeholder="Создать папку">
                             </div>
-                            <?php 
-                                $dirs = new Tree;
-                                $dirs->dir_output = '<input type="radio" name="dir" value="%%path%%" %%checked%%> %%short_path%%<br />';
-                                $dirs->current_path = $file->get_dir();
-                                $dirs->show_dir(MAIN_DIR);
-                            ?>
-                        </div>
+                            <div class="form__field form__field_full note-form__fieldset">
+                                <?php 
+                                    $dirs = new Tree;
+                                    $dirs->dir_output = '<div class="form__field">
+                                        <input type="hidden" name="rename" value="%%path%%">
+                                        <input class="form__text form__input note-form__input" type="text" name="dirs[%%path%%]" value="%%short_path%%">
+                                    </div>
+                                    <div class="form__field form__field_h-center">
+                                        <a class="link link_red confirm" href="/?path=%%path%%&del=1">[Удалить]</a>
+                                        <a class="link" href="/?path=%%path%%&export=1">[Экспорт в txt]</a>
+                                    </div>';
+                                    $dirs->show_dir(MAIN_DIR);
+                                ?>
+                            </div>
+                        <?php } else { ?>
+                            <div class="form__field">
+                                <label class="form__label">Заголовок</label>
+                                <input class="form__text form__input note-form__input" type="text" name="title" value="<?php echo $file->get_name() ?>">
+                            </div>
+                            <div class="form__field form__field_h-center">
+                                <input class="form__checkbox" type="checkbox" name="rename" value="<?php echo $file->get_path() ?>"> Переместить / переименовать
+                            </div>
+                            <div class="form__field">
+                                <textarea class="form__text form__textarea note-form__textarea form__textarea_active-tab" name="text" placeholder="Текст заметки"><?php echo $file->get_content() ?></textarea>
+                            </div>
+                            <div class="form__field">
+                                <label class="form__label">Папка</label>
+                                <div class="form__field form__field_full">
+                                    <input class="form__text form__input note-form__input" type="text" name="new_dir" placeholder="Создать папку">
+                                </div>
+                                <?php 
+                                    $dirs = new Tree;
+                                    $dirs->dir_output = '<input type="radio" name="dir" value="%%path%%" %%checked%%> %%short_path%%<br />';
+                                    $dirs->current_path = $file->get_dir();
+                                    $dirs->show_dir(MAIN_DIR);
+                                ?>
+                                <a class="link link_orange" href="/?path=<?php echo MAIN_DIR ?>">Управление папками</a>
+                            </div>
+                            <?php } ?>
                         <div class="form__field">
                             <input class="button form__button note-form__button" type="submit" value="Сохранить">
                         </div>
