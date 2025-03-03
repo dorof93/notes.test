@@ -27,15 +27,16 @@ if ( ! empty($_GET['export']) && ! empty($_GET['path']) ) {
         <title><?php echo $file->get_name() ?></title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Органайзер заметок - <?php echo $file->get_name() ?>">
+        <link rel="icon" href="/favicon.ico">
         <link href="/assets/style.css?v=<?php echo filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/style.css') ?>" rel="stylesheet">
-        <script src="/assets/script.js?v=<?php echo filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/script.js') ?>"></script>
     </head>
     <body>
         <div class="section">
             <div class="section__container">
                 <div class="header">
                     <div class="logo header__logo">
-                        <a href="/" class="title link link_big logo__link">
+                        <a href="/" class="title link link_big logo__link" title="Создать заметку">
                             /Органайзер/
                         </a>
                     </div>
@@ -56,7 +57,7 @@ if ( ! empty($_GET['export']) && ! empty($_GET['path']) ) {
                                 <ul class="list list__sub">';
                             $files->file_output = '
                                 <li class="list__item">
-                                    <a class="link list__link list__link_red confirm" data-confirm="Удалить заметку %%short_path%%?" href="/?path=%%path%%&del=1">
+                                    <a class="link list__link link_red confirm" title="Удалить" data-confirm="Удалить заметку %%short_path%%?" href="/?path=%%path%%&del=1">
                                         [x]
                                     </a>
                                     <a class="link list__link %%curr_active%%" href="/?path=%%path%%">
@@ -100,7 +101,7 @@ if ( ! empty($_GET['export']) && ! empty($_GET['path']) ) {
                                 <?php 
                                     $dirs = new Tree;
                                     $dirs->dir_output = '<div class="form__field">
-                                        <input type="hidden" name="rename" value="%%path%%">
+                                        <input type="hidden" name="old_path" value="%%path%%">
                                         <input class="form__text form__input note-form__input" type="text" name="dirs[%%path%%]" value="%%short_path%%">
                                     </div>
                                     <div class="form__field form__field_h-center">
@@ -111,12 +112,13 @@ if ( ! empty($_GET['export']) && ! empty($_GET['path']) ) {
                                 ?>
                             </div>
                         <?php } else { ?>
+                            <input type="hidden" name="old_path" value="<?php echo $file->get_path() ?>">
                             <div class="form__field">
                                 <label class="form__label">Заголовок</label>
                                 <input class="form__text form__input note-form__input" type="text" name="title" value="<?php echo $file->get_name() ?>">
                             </div>
                             <div class="form__field form__field_h-center">
-                                <input class="form__checkbox" type="checkbox" name="rename" value="<?php echo $file->get_path() ?>"> Переместить / переименовать
+                                <input class="form__checkbox" type="checkbox" name="rename" value="1"> Переместить / переименовать
                             </div>
                             <div class="form__field">
                                 <textarea class="form__text form__textarea note-form__textarea form__textarea_active-tab" name="text" placeholder="Текст заметки"><?php echo $file->get_content() ?></textarea>
@@ -128,7 +130,7 @@ if ( ! empty($_GET['export']) && ! empty($_GET['path']) ) {
                                 </div>
                                 <?php 
                                     $dirs = new Tree;
-                                    $dirs->dir_output = '<input type="radio" name="dir" value="%%path%%" %%checked%%> %%short_path%%<br />';
+                                    $dirs->dir_output = '<input type="radio" name="dir" class="form__radio" value="%%path%%" %%checked%%> %%short_path%%<br />';
                                     $dirs->current_path = $file->get_dir();
                                     $dirs->show(MAIN_DIR);
                                 ?>
@@ -136,7 +138,7 @@ if ( ! empty($_GET['export']) && ! empty($_GET['path']) ) {
                             </div>
                             <?php } ?>
                         <div class="form__field">
-                            <input class="button form__button note-form__button" type="submit" value="Сохранить">
+                            <input class="button form__button note-form__button button_disabled" disabled type="submit" value="Сохранить">
                         </div>
                     </form>
                 </div>
@@ -145,5 +147,6 @@ if ( ! empty($_GET['export']) && ! empty($_GET['path']) ) {
                 </div>
             </div>
         </div>
+        <script src="/assets/script.js?v=<?php echo filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/script.js') ?>"></script>
     </body>
 </html>

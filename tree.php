@@ -51,6 +51,22 @@ class Tree {
         }
     }
 
+    public function rm ($path) {
+        if (is_file($path)) {
+            return unlink($path);
+        }
+        if (is_dir($path)) {
+            $cdir = scandir($dir);
+            foreach ($cdir as $key => $value) {
+                if ( ! in_array($value, array(".","..")) ) {
+                    rmRec($path . DIRECTORY_SEPARATOR . $value);
+                }
+            }
+            return rmdir($path); 
+        }
+        return false;
+    }
+
     public function get_short_path ($path) {
         $short_path = '';
         $pathinfo = pathinfo($path);

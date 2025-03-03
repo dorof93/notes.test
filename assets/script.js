@@ -53,6 +53,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let form = document.querySelector('.form');
     form.addEventListener('keydown', function (event) {
         var trgt = event.target;
+        if ( trgt.classList.contains('form__text') ) {
+            activate_submit(form);
+        }
         if ( event.key == 'Tab' && trgt.classList.contains('form__textarea_active-tab') ) {
             event.preventDefault();
             let start = trgt.selectionStart;
@@ -65,7 +68,17 @@ document.addEventListener('DOMContentLoaded', function() {
             trgt.selectionStart = trgt.selectionEnd = start + 1;
         }
     });
+    form.addEventListener('click', function (event) {
+        var trgt = event.target;
+        if ( trgt.classList.contains('form__checkbox') || trgt.classList.contains('form__radio') ) {
+            activate_submit(form);
+        }
+    });
 });
+function activate_submit (form) {
+    form.querySelector('.button').classList.remove('button_disabled');
+    form.querySelector('.button').disabled = false;
+}
 function getCookie(name) {
   let matches = document.cookie.match(new RegExp(
     "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"

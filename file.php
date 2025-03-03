@@ -42,6 +42,7 @@ class File {
         $this->content = $content;
     }
     public function set_file ($data) {
+        $save = false;
         if ( ! $this->validate_data($data) ) {
             header("Location:" . $_SERVER['REQUSET_URI']); 
             die();
@@ -52,15 +53,17 @@ class File {
         } else {
             $dir = $data['dir'];
         }
-        if ( ! empty($data['rename']) ) {
-            $this->set_path($data['rename']);
-            $this->delete();
-        }
         $file_path = $dir . DIRECTORY_SEPARATOR . $data['title'] . '.txt';
-        $text = $data['text'];
-        $this->set_path($file_path);
-        $this->set_content($text);
-        $save = $this->save();
+        if ( $this->validate_path($file_path, $data['old_path']) ) {
+            if ( ! empty($data['rename']) ) {
+                $this->set_path($data['old_path']);
+                $this->delete();
+            }
+            $text = $data['text'];
+            $this->set_path($file_path);
+            $this->set_content($text);
+            $save = $this->save();
+        }
         if ( $save ) {
             $_SESSION['success'][] = 'Заметка успешно сохранена';
         } else {
@@ -104,10 +107,19 @@ class File {
         if ( empty($data['title']) ) {
             $_SESSION['errors'][] = 'Пожалуйста, введите корректное название';
         }
+        if ( ! isset($data['text']) || ! isset($data['old_path']) ) {
+            $_SESSION['errors'][] = 'В запросе не указаны необходимые поля';
+        }
         if ( ! empty($_SESSION['errors']) ) {
             return false;
         }
-        if ( ! isset($data['text']) ) {
+        return true;
+    }
+    private function validate_path ($new_path, $old_path = '') {
+        if ( $old_path != $new_path && file_exists($new_path) ) {
+            $_SESSION['errors'][] = 'Элемент с таким названием уже существует';
+        }
+        if ( ! empty($_SESSION['errors']) ) {
             return false;
         }
         return true;
