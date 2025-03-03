@@ -6,9 +6,19 @@ class Tree {
     public $dir_list_before = '';
     public $dir_list_after = '';
 
-    public function show_dir ($dir) {
+    public function show ($dir, $mode = 'show') {
+        if ( ! file_exists($dir) || ! is_dir($dir) ) {
+            return false;
+        }
         $cdir = scandir($dir);
         natcasesort($cdir);
+
+        if ($mode == 'export') {
+            $filename = str_replace('/', '--', $dir);
+            header('Content-Type: text/plain');
+            header('Content-Disposition: attachment; filename=' . $filename . '.txt');
+        }
+
         echo $this->dir_list_before;
         foreach ($cdir as $key => $value) {
             if ( ! in_array($value, array(".","..")) ) {
@@ -25,13 +35,20 @@ class Tree {
                 $output = str_replace('%%short_path%%', $short_path, $output);
                 $output = str_replace('%%checked%%', $checked, $output);
                 $output = str_replace('%%curr_active%%', $curr_active, $output);
+                if ( strpos( $output, '%%content%%' ) !== false && file_exists($path) && ! is_dir($path) ) {
+                    $content = file_get_contents($path);
+                    $output = str_replace('%%content%%', $content, $output);
+                }
                 echo $output;
                 if ( is_dir($path) ) {
-                    $this->show_dir($path);
+                    $this->show($path);
                 }
             }
         }
         echo $this->dir_list_after;
+        if ($mode == 'export') {
+            die();
+        }
     }
 
     public function get_short_path ($path) {

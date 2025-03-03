@@ -3,6 +3,7 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 'on');
 const MAIN_DIR = 'notes';
+const TRASH_DIR = 'archive';
 require_once('file.php');
 require_once('helper.php');
 require_once('tree.php');
@@ -12,6 +13,12 @@ if ( ! empty($_POST) ) {
 }
 if ( ! empty($_GET['del']) ) {
     $file->del_file();
+}
+if ( ! empty($_GET['export']) && ! empty($_GET['path']) ) {
+    $tree = new Tree;
+    $tree->dir_list_before = 'Папка ' . $_GET['path'] . ' (экспортировано ' . date('Y-m-d H:i:s') .')';
+    $tree->file_output = "\n\n\n-------- %%path%% --------\n\n%%content%%\n\n\n";
+    $tree->show($_GET['path'], 'export');
 }
 ?>
 <!DOCTYPE html>
@@ -57,7 +64,7 @@ if ( ! empty($_GET['del']) ) {
                                     </a>
                                 </li>
                             ';
-                            $files->show_dir(MAIN_DIR);
+                            $files->show(MAIN_DIR);
                         ?>
                     </ul>
                     <form method="POST" class="form note-form">
@@ -85,7 +92,7 @@ if ( ! empty($_GET['del']) ) {
                                 <?php unset($_SESSION['success']); ?>
                             <?php } ?>
                         </div>
-                        <?php if ( ! empty($_GET['path']) && $_GET['path'] == MAIN_DIR ) { ?>
+                        <?php if ( ! empty($_GET['path']) && ( $_GET['path'] == MAIN_DIR || $_GET['path'] == TRASH_DIR ) ) { ?>
                             <div class="form__field form__field_full">
                                 <input class="form__text form__input note-form__input" type="text" name="new_dir" placeholder="Создать папку">
                             </div>
@@ -100,7 +107,7 @@ if ( ! empty($_GET['del']) ) {
                                         <a class="link link_red confirm" href="/?path=%%path%%&del=1">[Удалить]</a>
                                         <a class="link" href="/?path=%%path%%&export=1">[Экспорт в txt]</a>
                                     </div>';
-                                    $dirs->show_dir(MAIN_DIR);
+                                    $dirs->show($_GET['path']);
                                 ?>
                             </div>
                         <?php } else { ?>
@@ -123,7 +130,7 @@ if ( ! empty($_GET['del']) ) {
                                     $dirs = new Tree;
                                     $dirs->dir_output = '<input type="radio" name="dir" value="%%path%%" %%checked%%> %%short_path%%<br />';
                                     $dirs->current_path = $file->get_dir();
-                                    $dirs->show_dir(MAIN_DIR);
+                                    $dirs->show(MAIN_DIR);
                                 ?>
                                 <a class="link link_orange" href="/?path=<?php echo MAIN_DIR ?>">Управление папками</a>
                             </div>
