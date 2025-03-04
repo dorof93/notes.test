@@ -3,22 +3,31 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 'on');
 const MAIN_DIR = 'notes';
-const TRASH_DIR = 'archive';
 require_once('file.php');
 require_once('helper.php');
 require_once('tree.php');
 $file = new File;
 if ( ! empty($_POST) ) {
-    $file->set_file($_POST);
+    if ( ! empty($_POST['dirs']) ) {
+    } else {
+        $file->set_file($_POST);
+    }
 }
 if ( ! empty($_GET['del']) ) {
     $file->del_file();
+}
+if ( ! empty($_GET['trash']) ) {
+    $file->trash_file();
 }
 if ( ! empty($_GET['export']) && ! empty($_GET['path']) ) {
     $tree = new Tree;
     $tree->dir_list_before = 'Папка ' . $_GET['path'] . ' (экспортировано ' . date('Y-m-d H:i:s') .')';
     $tree->file_output = "\n\n\n-------- %%path%% --------\n\n%%content%%\n\n\n";
     $tree->show($_GET['path'], 'export');
+}
+if ( ! empty($_GET['del_tree']) && ! empty($_GET['path']) ) {
+    $tree = new Tree;
+    $tree->rm($_GET['path']);
 }
 ?>
 <!DOCTYPE html>
@@ -31,7 +40,7 @@ if ( ! empty($_GET['export']) && ! empty($_GET['path']) ) {
         <link rel="icon" href="/favicon.ico">
         <link href="/assets/style.css?v=<?php echo filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/style.css') ?>" rel="stylesheet">
     </head>
-    <body>
+    <body class="<?php echo $file->get_css_classes() ?>">
         <div class="section">
             <div class="section__container">
                 <div class="header">
@@ -40,7 +49,15 @@ if ( ! empty($_GET['export']) && ! empty($_GET['path']) ) {
                             /Органайзер/
                         </a>
                     </div>
-                    <div class="menu-switcher">
+                    <ul class="menu menu_inline header__menu hide">
+                        <li class="menu__item menu__item_show-trash">
+                            <span class="menu__link">Показать корзину</span>
+                        </li>
+                        <li class="menu__item menu__item_hide-trash">
+                            <span class="menu__link">Скрыть корзину</span>
+                        </li>
+                    </ul>
+                    <div class="menu-switcher header__menu-switcher">
                         <span class="menu-switcher__line"></span>
                         <span class="menu-switcher__line"></span>
                         <span class="menu-switcher__line"></span>
@@ -56,11 +73,14 @@ if ( ! empty($_GET['export']) && ! empty($_GET['path']) ) {
                                 <span class="list__item_bold accordeon" data-acc_id="%%short_path%%">%%short_path%%</span>
                                 <ul class="list list__sub">';
                             $files->file_output = '
-                                <li class="list__item">
-                                    <a class="link list__link link_red confirm" title="Удалить" data-confirm="Удалить заметку %%short_path%%?" href="/?path=%%path%%&del=1">
+                                <li class="list__item tree__item">
+                                    <a class="link tree__recov list__link link_green confirm" title="Восстановить" data-confirm="Восстановить заметку %%short_path%%?" href="/?path=%%path%%&trash=1">
+                                        [+]
+                                    </a>
+                                    <a class="link tree__trash list__link link_red confirm" title="В корзину" data-confirm="Переместить в корзину заметку %%short_path%%?" href="/?path=%%path%%&trash=1">
                                         [x]
                                     </a>
-                                    <a class="link list__link %%curr_active%%" href="/?path=%%path%%">
+                                    <a class="link tree__link list__link %%curr_active%%" href="/?path=%%path%%">
                                         %%short_path%%
                                     </a>
                                 </li>
@@ -93,7 +113,7 @@ if ( ! empty($_GET['export']) && ! empty($_GET['path']) ) {
                                 <?php unset($_SESSION['success']); ?>
                             <?php } ?>
                         </div>
-                        <?php if ( ! empty($_GET['path']) && ( $_GET['path'] == MAIN_DIR || $_GET['path'] == TRASH_DIR ) ) { ?>
+                        <?php if ( ! empty($_GET['path']) && ( $_GET['path'] == MAIN_DIR ) ) { ?>
                             <div class="form__field form__field_full">
                                 <input class="form__text form__input note-form__input" type="text" name="new_dir" placeholder="Создать папку">
                             </div>
@@ -105,7 +125,7 @@ if ( ! empty($_GET['export']) && ! empty($_GET['path']) ) {
                                         <input class="form__text form__input note-form__input" type="text" name="dirs[%%path%%]" value="%%short_path%%">
                                     </div>
                                     <div class="form__field form__field_h-center">
-                                        <a class="link link_red confirm" href="/?path=%%path%%&del=1">[Удалить]</a>
+                                        <a class="link link_red confirm" data-confirm="Удалить папку %%short_path%%?" href="/?path=%%path%%&del_tree=1">[Удалить]</a>
                                         <a class="link" href="/?path=%%path%%&export=1">[Экспорт в txt]</a>
                                     </div>';
                                     $dirs->show($_GET['path']);
@@ -118,23 +138,28 @@ if ( ! empty($_GET['export']) && ! empty($_GET['path']) ) {
                                 <input class="form__text form__input note-form__input" type="text" name="title" value="<?php echo $file->get_name() ?>">
                             </div>
                             <div class="form__field form__field_h-center">
-                                <input class="form__checkbox" type="checkbox" name="rename" value="1"> Переместить / переименовать
+                                <?php if ( ! empty($file->get_name()) ) { ?>
+                                    <input class="form__checkbox" type="checkbox" name="rename" value="1"> Переместить / переименовать<br />
+                                    <a class="link link_red confirm" title="Удалить" data-confirm="Удалить заметку <?php echo $file->get_name() ?>?" href="/?path=<?php echo $file->get_path() ?>&del=1">
+                                        Удалить безвозвратно
+                                    </a>
+                                <?php } ?>
                             </div>
                             <div class="form__field">
                                 <textarea class="form__text form__textarea note-form__textarea form__textarea_active-tab" name="text" placeholder="Текст заметки"><?php echo $file->get_content() ?></textarea>
                             </div>
-                            <div class="form__field">
+                            <div class="form__field note-form__dirs">
                                 <label class="form__label">Папка</label>
                                 <div class="form__field form__field_full">
                                     <input class="form__text form__input note-form__input" type="text" name="new_dir" placeholder="Создать папку">
                                 </div>
+                                <a class="link link_orange" href="/?path=<?php echo MAIN_DIR ?>">Управление папками</a><br /><br />
                                 <?php 
                                     $dirs = new Tree;
                                     $dirs->dir_output = '<input type="radio" name="dir" class="form__radio" value="%%path%%" %%checked%%> %%short_path%%<br />';
                                     $dirs->current_path = $file->get_dir();
                                     $dirs->show(MAIN_DIR);
                                 ?>
-                                <a class="link link_orange" href="/?path=<?php echo MAIN_DIR ?>">Управление папками</a>
                             </div>
                             <?php } ?>
                         <div class="form__field">

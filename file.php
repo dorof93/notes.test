@@ -54,10 +54,12 @@ class File {
             $dir = $data['dir'];
         }
         $file_path = $dir . DIRECTORY_SEPARATOR . $data['title'] . '.txt';
+        $redirect = '/?path=' . $file_path;
         if ( $this->validate_path($file_path, $data['old_path']) ) {
             if ( ! empty($data['rename']) ) {
                 $this->set_path($data['old_path']);
                 $this->delete();
+                // $_SESSION['success'][] = 'Заметка успешно переименована / перемещена в другую папку';
             }
             $text = $data['text'];
             $this->set_path($file_path);
@@ -65,22 +67,59 @@ class File {
             $save = $this->save();
         }
         if ( $save ) {
-            $_SESSION['success'][] = 'Заметка успешно сохранена';
+            if ( ! empty($data['trash']) ) {
+                $redirect = '/';
+            } else {
+                $_SESSION['success'][] = 'Заметка успешно сохранена';
+            }
         } else {
+            unset($_SESSION['success']);
             $_SESSION['errors'][] = 'Ошибка записи. Попробуйте позднее';
         }
-        header("Location:/?path=" . $file_path); 
+        header("Location: " . $redirect); 
         die();
+    }
+    public function trash_file () {
+        $name = $this->get_name();
+        if ( $this->is_trash() ) {
+            $_SESSION['success'][] = 'Заметка была восстановлена из корзины';
+            $title = substr($name, 1); 
+        } else {
+            $_SESSION['success'][] = 'Заметка была перемещена в корзину';
+            $title = '.' . $name;
+        }
+        return $this->set_file([
+            'dir'      => $this->get_dir(),
+            'title'    => $title,
+            'old_path' => $this->path,
+            'text'     => $this->content,
+            'rename'   => 1,
+            'trash'    => 1,
+        ]);
     }
     public function del_file () {
         if ( $this->delete() ) {
             $_SESSION['success'][] = 'Заметка ' . $this->path . ' удалена';
-            header("Location:/"); 
+            header("Location: /"); 
         } else {
             $_SESSION['errors'][] = 'Ошибка удаления ' . $this->path . '. Попробуйте позднее';
-            header("Location:" . $_SERVER['REQUSET_URI']); 
+            header("Location: " . $_SERVER['REQUSET_URI']); 
         }
         die();
+    }
+    public function get_css_classes () {
+        $css_classes = [];
+        if ( $this->is_trash() ) {
+            $css_classes[] = 'page_trash';
+        }
+        return implode(' ', $css_classes);
+    }
+    private function is_trash () {
+        $name = $this->get_name();
+        if ( ! empty($name) && $name[0] == '.' ) {
+            return true;
+        }
+        return false;
     }
     private function save () {
         if ( ! empty($this->path) ) {
@@ -118,6 +157,14 @@ class File {
     private function validate_path ($new_path, $old_path = '') {
         if ( $old_path != $new_path && file_exists($new_path) ) {
             $_SESSION['errors'][] = 'Элемент с таким названием уже существует';
+        }
+        $symbols = [
+            '?', ':', '..',
+        ];
+        foreach ($symbols as $symbol) {
+            if ( strpos($new_path, $symbol) !== false ) {
+                $_SESSION['errors'][] = 'Путь к файлу содержит недопустимые символы';
+            }
         }
         if ( ! empty($_SESSION['errors']) ) {
             return false;

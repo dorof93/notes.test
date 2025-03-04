@@ -180,7 +180,7 @@ body {
   .header {
     display: grid;
     grid-template-rows: auto;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 30px;
     align-items: center;
     height: 5vh;
   }
@@ -197,6 +197,41 @@ body {
   }
   .logo__img {
     max-height: 100px;
+  }
+  .menu {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  .menu_inline {
+
+  }
+  .header__menu {
+    text-align: right;
+  }
+  .menu__item {
+    padding: 0px 20px;
+    cursor: pointer;
+  }
+  .menu-switcher {
+    cursor: pointer;
+    width: 30px;
+    justify-self: end;
+  }
+  .menu-switcher__line {
+    display: block;
+    height: 5px;
+    border-top: 3px solid #000;
+    width: 100%;
+  }
+  .menu__item_hide-trash {
+    display: none;
+  }
+  .page_trash .menu__item_hide-trash {
+    display: block;
+  }
+  .page_trash .menu__item_show-trash {
+    display: none;
   }
 .workspace {
   display: grid;
@@ -216,10 +251,34 @@ body {
   font-weight: 700;
 }
 .link_red {
-  color: #F0483D;
+  color: red;
+}
+.link_orange {
+  color: #EB5A0A;
+}
+.link_green {
+  color: limegreen;
 }
 .list__item_bold {
   font-weight: 700;
+}
+.tree__item_trash {
+  display: none;
+}
+.page_trash .tree__item {
+  display: none;
+}
+.page_trash .tree__item_trash {
+  display: block;
+}
+.tree__recov {
+  display: none;
+}
+.tree__item_trash .tree__recov {
+  display: inline;
+}
+.tree__item_trash .tree__trash {
+  display: none;
 }
 .list__link.active {
   font-weight: 700;
@@ -239,6 +298,25 @@ body {
 }
 .note-form__button {
   margin-top: 15px;
+}
+.note-form__dirs {
+  position: relative;
+  /* height: 100%;
+  box-sizing: border-box; */
+  overflow: auto;
+}
+.note-form__dirs_bottom-pad {
+  /* padding-bottom: 40px; */
+}
+.note-form__dirs-panel_bottom {
+  /* position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  height: 20px;
+  width: 100%;
+  background: #fff;
+  padding-top: 10px; */
 }
 .form__field_h-center {
   align-self: center;
@@ -485,9 +563,12 @@ body {
   display: block;
 }
 .list__sub {
-  /* min-height: 800px; */
+  min-height: 20px;
   /* padding-bottom: 150px;
   margin-bottom: -150px; */
+}
+.hide {
+  visibility: hidden;
 }
 
 @media (max-width: 767px) {

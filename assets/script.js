@@ -1,27 +1,44 @@
 document.addEventListener('DOMContentLoaded', function() {
     let tree = document.querySelector('.tree');
-    let tree_items = tree.querySelectorAll('.list__item');
+    let tree_items = tree.querySelectorAll('.tree__dir');
     for (let i = 0; i < tree_items.length; i++) {
         let item = tree_items[i];
-        let is_active = item.querySelectorAll('.active').length;
-        if (is_active) {
-            let accordeon = item.querySelector('.accordeon');
-            if (accordeon) {
-                accordeon.classList.add('accordeon_show');
+        // let is_active = item.querySelectorAll('.active').length;
+        let links = item.querySelectorAll('.tree__link');
+        for (let j = 0; j < links.length; j++) {
+            let link = links[j];
+            // let link_text = link.textContent;
+            // console.log(link.textContent.includes('/.'));
+            // let is_hide = link_text.includes('/.');
+            if ( link.textContent.includes('/.') ) {
+                link.parentElement.classList.add('tree__item_trash');
             }
-            if ( ! item.classList.contains('tree__dir')) {
-                item.scrollIntoView();
-                // item.scrollBy({
-                //     // top: item.getBoundingClientRect().top,
-                //     top: 20000,
-                // });
-                // item.scrollTop = 100;
-                // item.scrollIntoView();
-                // console.log(i);
-                // console.log(item);
-                // console.log(item.getBoundingClientRect().top);
+            if ( link.classList.contains('active')) {
+                let accordeon = item.querySelector('.accordeon');
+                if (accordeon) {
+                    accordeon.classList.add('accordeon_show');
+                }
+                link.scrollIntoView();
             }
         }
+        // if (is_active) {
+        //     let accordeon = item.querySelector('.accordeon');
+        //     if (accordeon) {
+        //         accordeon.classList.add('accordeon_show');
+        //     }
+        //     if ( ! item.classList.contains('tree__dir')) {
+        //         item.scrollIntoView();
+        //         // item.scrollBy({
+        //         //     // top: item.getBoundingClientRect().top,
+        //         //     top: 20000,
+        //         // });
+        //         // item.scrollTop = 100;
+        //         // item.scrollIntoView();
+        //         // console.log(i);
+        //         // console.log(item);
+        //         // console.log(item.getBoundingClientRect().top);
+        //     }
+        // }
     }
     let accordeons = document.querySelectorAll('.accordeon');
     for (let i = 0; i < accordeons.length; i++) {
@@ -49,13 +66,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 event.preventDefault();
             }
         }
+        if ( trgt.parentElement.classList.contains('header__menu-switcher') ) {
+            document.querySelector('.header__menu').classList.toggle('hide');
+        }
+        if ( trgt.parentElement.classList.contains('menu__item_hide-trash') ) {
+            document.querySelector('body').classList.remove('page_trash');
+        }
+        if ( trgt.parentElement.classList.contains('menu__item_show-trash') ) {
+            document.querySelector('body').classList.add('page_trash');
+        }
     });
     let form = document.querySelector('.form');
     form.addEventListener('keydown', function (event) {
         var trgt = event.target;
-        if ( trgt.classList.contains('form__text') ) {
-            activate_submit(form);
-        }
         if ( event.key == 'Tab' && trgt.classList.contains('form__textarea_active-tab') ) {
             event.preventDefault();
             let start = trgt.selectionStart;
@@ -66,12 +89,19 @@ document.addEventListener('DOMContentLoaded', function() {
         
             // put caret at right position again
             trgt.selectionStart = trgt.selectionEnd = start + 1;
+            activate_submit(this);
+        }
+    });
+    form.addEventListener('input', function (event) {
+        var trgt = event.target;
+        if ( trgt.classList.contains('form__text') ) {
+            activate_submit(this);
         }
     });
     form.addEventListener('click', function (event) {
         var trgt = event.target;
         if ( trgt.classList.contains('form__checkbox') || trgt.classList.contains('form__radio') ) {
-            activate_submit(form);
+            activate_submit(this);
         }
     });
 });
