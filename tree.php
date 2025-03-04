@@ -23,7 +23,7 @@ class Tree {
         foreach ($cdir as $key => $value) {
             if ( ! in_array($value, array(".","..")) ) {
                 $path = $dir . DIRECTORY_SEPARATOR . $value;
-                $short_path = $this->get_short_path($path);
+                $short_path = Helper::get_short_path($path);
                 $checked = Helper::check_elem_active($path, $this->current_path, 'checked="cheked"');
                 $curr_active = Helper::check_elem_active($path, $this->current_path, 'active');
                 if ( is_dir($path) ) {
@@ -51,15 +51,17 @@ class Tree {
         }
     }
 
-    public function rm ($path) {
+    public function delete ($path) {
         if (is_file($path)) {
-            return unlink($path);
+            $file = new File;
+            $file->set_path($path);
+            $file->del_file();
         }
         if (is_dir($path)) {
-            $cdir = scandir($dir);
+            $cdir = scandir($path);
             foreach ($cdir as $key => $value) {
                 if ( ! in_array($value, array(".","..")) ) {
-                    rmRec($path . DIRECTORY_SEPARATOR . $value);
+                    $this->delete($path . DIRECTORY_SEPARATOR . $value);
                 }
             }
             return rmdir($path); 
@@ -67,15 +69,23 @@ class Tree {
         return false;
     }
 
-    public function get_short_path ($path) {
-        $short_path = '';
-        $pathinfo = pathinfo($path);
-        if ( ! empty($pathinfo['dirname']) ) {
-            $short_path = str_replace([MAIN_DIR . '/', MAIN_DIR], '', $pathinfo['dirname']);
+    public function rename ($old_path, $new_path) {
+        if ( ! Helper::validate_path($new_path, $old_path) ) {
+            return false;
         }
-        if ( ! empty($pathinfo['filename']) ) {
-            $short_path = $short_path . DIRECTORY_SEPARATOR . $pathinfo['filename'];
-        }
-        return $short_path;
+        return rename($old_path, $new_path); 
     }
+
+    public function mass_rename ($dirs) {
+        if ( ! empty($dirs) && is_array($dirs) ) {
+            foreach ($dirs as $old_path => $new_name) {
+                $new_path = MAIN_DIR . DIRECTORY_SEPARATOR . $new_name;
+                $new_path = str_replace('//', '/', $new_path);
+                if ( $old_path != $new_path ) {
+                    $this->rename($old_path, $new_path);
+                }
+            }
+        }
+    }
+
 }

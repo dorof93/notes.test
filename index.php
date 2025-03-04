@@ -3,18 +3,21 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 'on');
 const MAIN_DIR = 'notes';
-require_once('file.php');
 require_once('helper.php');
+require_once('file.php');
 require_once('tree.php');
 $file = new File;
 if ( ! empty($_POST) ) {
     if ( ! empty($_POST['dirs']) ) {
+        $tree = new Tree;
+        $tree->mass_rename($_POST['dirs']);
     } else {
         $file->set_file($_POST);
     }
 }
-if ( ! empty($_GET['del']) ) {
-    $file->del_file();
+if ( ! empty($_GET['del']) && ! empty($_GET['path']) ) {
+    $tree = new Tree;
+    $tree->delete($_GET['path']);
 }
 if ( ! empty($_GET['trash']) ) {
     $file->trash_file();
@@ -24,10 +27,6 @@ if ( ! empty($_GET['export']) && ! empty($_GET['path']) ) {
     $tree->dir_list_before = 'Папка ' . $_GET['path'] . ' (экспортировано ' . date('Y-m-d H:i:s') .')';
     $tree->file_output = "\n\n\n-------- %%path%% --------\n\n%%content%%\n\n\n";
     $tree->show($_GET['path'], 'export');
-}
-if ( ! empty($_GET['del_tree']) && ! empty($_GET['path']) ) {
-    $tree = new Tree;
-    $tree->rm($_GET['path']);
 }
 ?>
 <!DOCTYPE html>
@@ -114,18 +113,17 @@ if ( ! empty($_GET['del_tree']) && ! empty($_GET['path']) ) {
                             <?php } ?>
                         </div>
                         <?php if ( ! empty($_GET['path']) && ( $_GET['path'] == MAIN_DIR ) ) { ?>
-                            <div class="form__field form__field_full">
+                            <!--<div class="form__field form__field_full">
                                 <input class="form__text form__input note-form__input" type="text" name="new_dir" placeholder="Создать папку">
-                            </div>
+                            </div>-->
                             <div class="form__field form__field_full note-form__fieldset">
                                 <?php 
                                     $dirs = new Tree;
                                     $dirs->dir_output = '<div class="form__field">
-                                        <input type="hidden" name="old_path" value="%%path%%">
                                         <input class="form__text form__input note-form__input" type="text" name="dirs[%%path%%]" value="%%short_path%%">
                                     </div>
                                     <div class="form__field form__field_h-center">
-                                        <a class="link link_red confirm" data-confirm="Удалить папку %%short_path%%?" href="/?path=%%path%%&del_tree=1">[Удалить]</a>
+                                        <a class="link link_red confirm" data-confirm="Удалить папку %%short_path%%?" href="/?path=%%path%%&del=1">[Удалить]</a>
                                         <a class="link" href="/?path=%%path%%&export=1">[Экспорт в txt]</a>
                                     </div>';
                                     $dirs->show($_GET['path']);
@@ -161,7 +159,7 @@ if ( ! empty($_GET['del_tree']) && ! empty($_GET['path']) ) {
                                     $dirs->show(MAIN_DIR);
                                 ?>
                             </div>
-                            <?php } ?>
+                        <?php } ?>
                         <div class="form__field">
                             <input class="button form__button note-form__button button_disabled" disabled type="submit" value="Сохранить">
                         </div>

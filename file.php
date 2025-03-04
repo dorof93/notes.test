@@ -55,11 +55,10 @@ class File {
         }
         $file_path = $dir . DIRECTORY_SEPARATOR . $data['title'] . '.txt';
         $redirect = '/?path=' . $file_path;
-        if ( $this->validate_path($file_path, $data['old_path']) ) {
+        if ( Helper::validate_path($file_path, $data['old_path']) ) {
             if ( ! empty($data['rename']) ) {
                 $this->set_path($data['old_path']);
                 $this->delete();
-                // $_SESSION['success'][] = 'Заметка успешно переименована / перемещена в другую папку';
             }
             $text = $data['text'];
             $this->set_path($file_path);
@@ -100,11 +99,10 @@ class File {
     public function del_file () {
         if ( $this->delete() ) {
             $_SESSION['success'][] = 'Заметка ' . $this->path . ' удалена';
-            header("Location: /"); 
         } else {
             $_SESSION['errors'][] = 'Ошибка удаления ' . $this->path . '. Попробуйте позднее';
-            header("Location: " . $_SERVER['REQUSET_URI']); 
         }
+        header("Location: " . $_SERVER['REQUSET_URI']); 
         die();
     }
     public function get_css_classes () {
@@ -148,23 +146,6 @@ class File {
         }
         if ( ! isset($data['text']) || ! isset($data['old_path']) ) {
             $_SESSION['errors'][] = 'В запросе не указаны необходимые поля';
-        }
-        if ( ! empty($_SESSION['errors']) ) {
-            return false;
-        }
-        return true;
-    }
-    private function validate_path ($new_path, $old_path = '') {
-        if ( $old_path != $new_path && file_exists($new_path) ) {
-            $_SESSION['errors'][] = 'Элемент с таким названием уже существует';
-        }
-        $symbols = [
-            '?', ':', '..',
-        ];
-        foreach ($symbols as $symbol) {
-            if ( strpos($new_path, $symbol) !== false ) {
-                $_SESSION['errors'][] = 'Путь к файлу содержит недопустимые символы';
-            }
         }
         if ( ! empty($_SESSION['errors']) ) {
             return false;
