@@ -2,6 +2,7 @@
 session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 'on');
+setlocale(LC_ALL, 'C.UTF-8');
 const MAIN_DIR = 'notes';
 require_once('helper.php');
 require_once('file.php');
